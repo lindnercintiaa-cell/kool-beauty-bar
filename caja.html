@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kool Beauty Bar · Caja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose:     #E8A4B8;
+  --rose-lt:  #F5D6E2;
+  --rose-dk:  #C2637A;
+  --lilac:    #C4A8D4;
+  --lilac-lt: #EDE4F5;
+  --lilac-dk: #8B5FA0;
+  --sage:     #A8C4A2;
+  --sage-lt:  #DFF0DB;
+  --sage-dk:  #5A8A52;
+  --sky:      #A4C8E0;
+  --sky-lt:   #D6ECF5;
+  --sky-dk:   #3A7FA0;
+  --amber:    #E8C97A;
+  --amber-lt: #FBF3D6;
+  --amber-dk: #B8922A;
+  --bg:       #FDF6FA;
+  --surface:  #FFFFFF;
+  --text:     #2D1F2E;
+  --muted:    #8A6E80;
+  --border:   rgba(196,168,212,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;font-weight:300;color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 55% 40% at 5% 10%,rgba(232,164,184,.15) 0%,transparent 70%),radial-gradient(ellipse 45% 35% at 95% 20%,rgba(196,168,212,.13) 0%,transparent 65%),radial-gradient(ellipse 50% 40% at 80% 85%,rgba(164,200,224,.12) 0%,transparent 65%),radial-gradient(ellipse 40% 35% at 15% 90%,rgba(168,196,162,.12) 0%,transparent 60%);pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:44px 20px 80px}
+
+/* Header */
+.header{text-align:center;margin-bottom:36px;animation:fadeDown .7s ease both}
+.gems{display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:12px}
+.gem{width:7px;height:7px;border-radius:50%}
+.gline{height:1px;width:36px;opacity:.45}
+.logo{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;letter-spacing:4px;color:var(--text);margin-bottom:4px}
+.logo em{font-style:italic;font-weight:400;background:linear-gradient(135deg,var(--rose-dk),var(--lilac-dk));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted)}
+
+/* Type selector */
+.type-selector{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:28px;animation:fadeUp .7s .1s ease both}
+.type-btn{border:1.5px solid var(--border);border-radius:16px;padding:16px 10px;background:var(--surface);cursor:pointer;text-align:center;transition:all .2s;position:relative;overflow:hidden}
+.type-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(196,168,212,.2)}
+.type-btn.active-servicio{border-color:var(--rose-dk);background:var(--rose-lt)}
+.type-btn.active-producto{border-color:var(--sage-dk);background:var(--sage-lt)}
+.type-btn.active-gasto{border-color:var(--amber-dk);background:var(--amber-lt)}
+.type-icon{font-size:24px;margin-bottom:6px}
+.type-name{font-size:12px;font-weight:500;letter-spacing:.5px;color:var(--text)}
+.type-desc{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* Card */
+.card{background:var(--surface);border-radius:22px;padding:32px 28px;border:1px solid var(--border);box-shadow:0 4px 32px rgba(196,168,212,.1);animation:fadeUp .7s .2s ease both;display:none}
+.card.show{display:block}
+@media(max-width:480px){.card{padding:24px 16px}}
+
+.section-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:500;margin-bottom:16px;margin-top:24px;display:flex;align-items:center;gap:8px}
+.section-label:first-child{margin-top:0}
+.section-label.rose{color:var(--rose-dk)}.section-label.rose::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(194,99,122,.25),transparent)}
+.section-label.sage{color:var(--sage-dk)}.section-label.sage::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(90,138,82,.25),transparent)}
+.section-label.amber{color:var(--amber-dk)}.section-label.amber::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(184,146,42,.25),transparent)}
+.section-label.lilac{color:var(--lilac-dk)}.section-label.lilac::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(139,95,160,.25),transparent)}
+
+.field{margin-bottom:16px}
+label{display:block;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text);font-weight:500;margin-bottom:7px}
+.opt{font-weight:300;color:var(--muted);text-transform:none;letter-spacing:0;font-size:11px}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;background:#FAFAFA;border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:300;color:var(--text);outline:none;transition:border-color .2s,background .2s;appearance:none;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--lilac);background:var(--lilac-lt)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+.select-wrap{position:relative}.select-wrap::after{content:'↓';position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--lilac-dk);pointer-events:none;font-size:12px}
+
+/* Monto grande */
+.monto-wrap{position:relative}
+.monto-prefix{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:20px;font-weight:400;color:var(--muted);font-family:'Playfair Display',serif}
+input.monto{padding-left:34px;font-size:22px;font-weight:400;font-family:'Playfair Display',serif;letter-spacing:1px}
+
+/* Pills */
+.pill-group{display:flex;flex-wrap:wrap;gap:7px}
+.pill-opt{display:inline-flex}
+.pill-opt input{position:absolute;opacity:0;width:0;height:0}
+.pill-lbl{display:inline-block;padding:7px 15px;border-radius:50px;border:1.5px solid var(--border);background:#FAFAFA;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:var(--muted);cursor:pointer;transition:all .18s;white-space:nowrap}
+.pill-opt:hover .pill-lbl{border-color:var(--lilac);color:var(--lilac-dk)}
+.pill-opt.rose input:checked+.pill-lbl{background:var(--rose-lt);border-color:var(--rose-dk);color:var(--rose-dk);font-weight:500}
+.pill-opt.sage input:checked+.pill-lbl{background:var(--sage-lt);border-color:var(--sage-dk);color:var(--sage-dk);font-weight:500}
+.pill-opt.amber input:checked+.pill-lbl{background:var(--amber-lt);border-color:var(--amber-dk);color:var(--amber-dk);font-weight:500}
+.pill-opt.sky input:checked+.pill-lbl{background:var(--sky-lt);border-color:var(--sky-dk);color:var(--sky-dk);font-weight:500}
+
+/* Submit */
+.submit-btn{width:100%;margin-top:28px;padding:15px;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;font-weight:500;cursor:pointer;transition:all .25s;color:white}
+.submit-btn.serv{background:linear-gradient(135deg,var(--rose-dk),var(--lilac-dk))}
+.submit-btn.prod{background:linear-gradient(135deg,var(--sage-dk),var(--sky-dk))}
+.submit-btn.gast{background:linear-gradient(135deg,var(--amber-dk),var(--rose-dk))}
+.submit-btn:hover{opacity:.85;transform:translateY(-1px)}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* Toast */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:white;padding:14px 28px;border-radius:50px;font-size:13px;font-weight:400;letter-spacing:.5px;transition:transform .3s ease;z-index:100;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Error */
+.err{font-size:11px;color:#c0392b;margin-top:4px;display:none}
+.err.on{display:block}
+
+@keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="gems">
+      <div class="gline" style="background:linear-gradient(90deg,var(--rose),var(--lilac))"></div>
+      <div class="gem" style="background:var(--rose)"></div>
+      <div class="gem" style="background:var(--lilac)"></div>
+      <div class="gem" style="background:var(--sage)"></div>
+      <div class="gem" style="background:var(--sky)"></div>
+      <div class="gline" style="background:linear-gradient(90deg,var(--sky),var(--sage))"></div>
+    </div>
+    <div class="logo">KOOL <em>beauty</em> bar</div>
+    <div class="subtitle">Registro de caja</div>
+  </div>
+
+  <!-- Selector de tipo -->
+  <div class="type-selector">
+    <div class="type-btn" id="btn-servicio" onclick="selectType('servicio')">
+      <div class="type-icon">✂️</div>
+      <div class="type-name">Servicio</div>
+      <div class="type-desc">Cobro de clienta</div>
+    </div>
+    <div class="type-btn" id="btn-producto" onclick="selectType('producto')">
+      <div class="type-icon">🛍️</div>
+      <div class="type-name">Producto</div>
+      <div class="type-desc">Venta de producto</div>
+    </div>
+    <div class="type-btn" id="btn-gasto" onclick="selectType('gasto')">
+      <div class="type-icon">📋</div>
+      <div class="type-name">Gasto</div>
+      <div class="type-desc">Egreso / pago</div>
+    </div>
+  </div>
+
+  <!-- FORM SERVICIO -->
+  <div class="card" id="card-servicio">
+    <div class="section-label rose">Cobro de servicio</div>
+
+    <div class="field">
+      <label for="s-clienta">Nombre de la clienta</label>
+      <input type="text" id="s-clienta" placeholder="Ej: María González">
+      <div class="err" id="e-s-clienta">Ingresá el nombre.</div>
+    </div>
+
+    <div class="field">
+      <label for="s-fecha">Fecha</label>
+      <input type="date" id="s-fecha">
+    </div>
+
+    <div class="field">
+      <label>Servicios realizados</label>
+      <div class="pill-group" id="s-servicios-group">
+        <label class="pill-opt rose"><input type="checkbox" name="s-serv" value="Corte"><span class="pill-lbl">Corte</span></label>
+        <label class="pill-opt rose"><input type="checkbox" name="s-serv" value="Corte y tratamiento"><span class="pill-lbl">Corte y tratamiento</span></label>
+        <label class="pill-opt rose"><input type="checkbox" name="s-serv" value="Color"><span class="pill-lbl">Color</span></label>
+        <label class="pill-opt rose"><input type="checkbox" name="s-serv" value="Color en raíces"><span class="pill-lbl">Color raíces</span></label>
+        <label class="pill-opt rose"><input type="checkbox" name="s-serv" value="Color completo"><span class="pill-lbl">Color completo</span></label>
+        <label class="pill-opt rose"><input type="checkbox" name="s-serv" value="Corte y color"><span class="pill-lbl">Corte y color</span></label>
+        <label class="pill-opt rose"><input type="checkbox" name="s-serv" value="Mechas"><span class="pill-lbl">Mechas</span></label>
+        <label class="pill-opt rose"><input type="checkbox" name="s-serv" value="Tratamiento"><span class="pill-lbl">Tratamiento</span></label>
+      </div>
+      <div class="err" id="e-s-serv">Seleccioná al menos un servicio.</div>
+    </div>
+
+    <div class="field">
+      <label>¿También compró producto?</label>
+      <div class="pill-group">
+        <label class="pill-opt sage"><input type="radio" name="s-comproproducto" value="No" checked><span class="pill-lbl">No</span></label>
+        <label class="pill-opt sage"><input type="radio" name="s-comproproducto" value="Sí"><span class="pill-lbl">Sí</span></label>
+      </div>
+    </div>
+
+    <div id="s-producto-extra" style="display:none">
+      <div class="field">
+        <label for="s-prod-nombre">¿Qué producto?</label>
+        <input type="text" id="s-prod-nombre" placeholder="Ej: Shampoo rizos 300ml">
+      </div>
+    </div>
+
+    <div class="section-label lilac">Pago</div>
+
+    <div class="field">
+      <label>Medio de pago</label>
+      <div class="pill-group">
+        <label class="pill-opt sky"><input type="radio" name="s-pago" value="Efectivo"><span class="pill-lbl">Efectivo</span></label>
+        <label class="pill-opt sky"><input type="radio" name="s-pago" value="Transferencia"><span class="pill-lbl">Transferencia</span></label>
+        <label class="pill-opt sky"><input type="radio" name="s-pago" value="Tarjeta"><span class="pill-lbl">Tarjeta</span></label>
+      </div>
+      <div class="err" id="e-s-pago">Seleccioná el medio de pago.</div>
+    </div>
+
+    <div class="field">
+      <label for="s-monto">Total cobrado</label>
+      <div class="monto-wrap">
+        <span class="monto-prefix">$</span>
+        <input type="number" id="s-monto" class="monto" placeholder="0" min="0">
+      </div>
+      <div class="err" id="e-s-monto">Ingresá el monto.</div>
+    </div>
+
+    <div class="field">
+      <label for="s-nota">Nota <span class="opt">· opcional</span></label>
+      <textarea id="s-nota" rows="2" placeholder="Algo a destacar..."></textarea>
+    </div>
+
+    <button class="submit-btn serv" id="btn-s" onclick="submitServicio()">Registrar cobro</button>
+  </div>
+
+  <!-- FORM PRODUCTO -->
+  <div class="card" id="card-producto">
+    <div class="section-label sage">Venta de producto</div>
+
+    <div class="field">
+      <label for="p-clienta">Nombre del cliente <span class="opt">· opcional</span></label>
+      <input type="text" id="p-clienta" placeholder="Ej: María González">
+    </div>
+
+    <div class="field">
+      <label for="p-fecha">Fecha</label>
+      <input type="date" id="p-fecha">
+    </div>
+
+    <div class="field">
+      <label for="p-producto">Producto vendido</label>
+      <input type="text" id="p-producto" placeholder="Ej: Mascarilla rizos 250ml">
+      <div class="err" id="e-p-producto">Ingresá el producto.</div>
+    </div>
+
+    <div class="field">
+      <label for="p-cantidad">Cantidad</label>
+      <input type="number" id="p-cantidad" placeholder="1" min="1" value="1" style="max-width:120px">
+    </div>
+
+    <div class="section-label lilac">Pago</div>
+
+    <div class="field">
+      <label>Medio de pago</label>
+      <div class="pill-group">
+        <label class="pill-opt sky"><input type="radio" name="p-pago" value="Efectivo"><span class="pill-lbl">Efectivo</span></label>
+        <label class="pill-opt sky"><input type="radio" name="p-pago" value="Transferencia"><span class="pill-lbl">Transferencia</span></label>
+        <label class="pill-opt sky"><input type="radio" name="p-pago" value="Tarjeta"><span class="pill-lbl">Tarjeta</span></label>
+      </div>
+      <div class="err" id="e-p-pago">Seleccioná el medio de pago.</div>
+    </div>
+
+    <div class="field">
+      <label for="p-monto">Total cobrado</label>
+      <div class="monto-wrap">
+        <span class="monto-prefix">$</span>
+        <input type="number" id="p-monto" class="monto" placeholder="0" min="0">
+      </div>
+      <div class="err" id="e-p-monto">Ingresá el monto.</div>
+    </div>
+
+    <div class="field">
+      <label for="p-nota">Nota <span class="opt">· opcional</span></label>
+      <textarea id="p-nota" rows="2" placeholder="Algo a destacar..."></textarea>
+    </div>
+
+    <button class="submit-btn prod" id="btn-p" onclick="submitProducto()">Registrar venta</button>
+  </div>
+
+  <!-- FORM GASTO -->
+  <div class="card" id="card-gasto">
+    <div class="section-label amber">Registro de gasto</div>
+
+    <div class="field">
+      <label for="g-fecha">Fecha</label>
+      <input type="date" id="g-fecha">
+    </div>
+
+    <div class="field">
+      <label>Categoría</label>
+      <div class="select-wrap">
+        <select id="g-categoria">
+          <option value="">— Elegí una categoría —</option>
+          <option>Servicios (luz, agua, gas, internet)</option>
+          <option>Ayudante / personal</option>
+          <option>Productos para reventa</option>
+          <option>Insumos de trabajo</option>
+          <option>Alquiler</option>
+          <option>Comida / viáticos</option>
+          <option>Marketing / redes</option>
+          <option>Equipamiento</option>
+          <option>Otro</option>
+        </select>
+      </div>
+      <div class="err" id="e-g-cat">Elegí una categoría.</div>
+    </div>
+
+    <div class="field">
+      <label for="g-detalle">Detalle</label>
+      <input type="text" id="g-detalle" placeholder="Ej: Factura de luz enero">
+      <div class="err" id="e-g-det">Ingresá el detalle.</div>
+    </div>
+
+    <div class="field">
+      <label for="g-monto">Monto gastado</label>
+      <div class="monto-wrap">
+        <span class="monto-prefix">$</span>
+        <input type="number" id="g-monto" class="monto" placeholder="0" min="0">
+      </div>
+      <div class="err" id="e-g-monto">Ingresá el monto.</div>
+    </div>
+
+    <div class="field">
+      <label for="g-nota">Nota <span class="opt">· opcional</span></label>
+      <textarea id="g-nota" rows="2" placeholder="Algo a destacar..."></textarea>
+    </div>
+
+    <button class="submit-btn gast" id="btn-g" onclick="submitGasto()">Registrar gasto</button>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzJafO8D0ad3OtUG42AIIxm_UN8CTmz3Ff2cx31QPajD7M3CkLqbK2VdPMrLLxrc14/exec';
+
+// Set today's date on all date fields
+function setDates() {
+  const today = new Date().toISOString().split('T')[0];
+  ['s-fecha','p-fecha','g-fecha'].forEach(id => {
+    document.getElementById(id).value = today;
+  });
+}
+setDates();
+
+// Type selector
+function selectType(type) {
+  ['servicio','producto','gasto'].forEach(t => {
+    document.getElementById('btn-'+t).className = 'type-btn';
+    document.getElementById('card-'+t).classList.remove('show');
+  });
+  document.getElementById('btn-'+type).classList.add('active-'+type);
+  document.getElementById('card-'+type).classList.add('show');
+  document.getElementById('card-'+type).scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+// Show/hide producto extra in servicio form
+document.querySelectorAll('input[name="s-comproproducto"]').forEach(r => {
+  r.addEventListener('change', () => {
+    document.getElementById('s-producto-extra').style.display =
+      document.querySelector('input[name="s-comproproducto"]:checked').value === 'Sí' ? 'block' : 'none';
+  });
+});
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Send to Sheets via hidden iframe
+function sendToSheets(data) {
+  try {
+    let iframe = document.getElementById('sheets-iframe');
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.id = 'sheets-iframe';
+      iframe.name = 'sheets-iframe';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+    }
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = SHEETS_URL;
+    form.target = 'sheets-iframe';
+    for (const [k, v] of Object.entries(data)) {
+      const inp = document.createElement('input');
+      inp.type = 'hidden'; inp.name = k; inp.value = v;
+      form.appendChild(inp);
+    }
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => form.remove(), 3000);
+  } catch(e) {}
+}
+
+function getVal(id) { return document.getElementById(id).value.trim(); }
+function getChecked(name) { const el = document.querySelector(`input[name="${name}"]:checked`); return el ? el.value : ''; }
+function getMultiCheck(name) { return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i=>i.value).join(', '); }
+function setErr(id, show) { document.getElementById(id).classList.toggle('on', show); }
+function clearBtn(id) { const b = document.getElementById(id); b.disabled = false; b.textContent = b.dataset.orig; }
+
+// SUBMIT SERVICIO
+function submitServicio() {
+  let ok = true;
+  const clienta = getVal('s-clienta');
+  setErr('e-s-clienta', !clienta); if (!clienta) ok = false;
+  const servicios = getMultiCheck('s-serv');
+  setErr('e-s-serv', !servicios); if (!servicios) ok = false;
+  const pago = getChecked('s-pago');
+  setErr('e-s-pago', !pago); if (!pago) ok = false;
+  const monto = getVal('s-monto');
+  setErr('e-s-monto', !monto); if (!monto) ok = false;
+  if (!ok) return;
+
+  const compro = getChecked('s-comproproducto');
+  const prodExtra = compro === 'Sí' ? getVal('s-prod-nombre') : '';
+  const fecha = getVal('s-fecha');
+  const nota = getVal('s-nota');
+
+  const btn = document.getElementById('btn-s');
+  btn.dataset.orig = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  sendToSheets({
+    tipo: 'Servicio',
+    fecha, clienta,
+    detalle: servicios + (prodExtra ? ' + Producto: ' + prodExtra : ''),
+    medio_pago: pago,
+    monto,
+    nota,
+    origen: 'Manual'
+  });
+
+  setTimeout(() => {
+    showToast('✦ Cobro registrado');
+    // Reset
+    document.getElementById('s-clienta').value = '';
+    document.querySelectorAll('input[name="s-serv"]').forEach(c => c.checked = false);
+    document.querySelector('input[name="s-comproproducto"][value="No"]').checked = true;
+    document.getElementById('s-producto-extra').style.display = 'none';
+    document.getElementById('s-prod-nombre').value = '';
+    document.querySelectorAll('input[name="s-pago"]').forEach(r => r.checked = false);
+    document.getElementById('s-monto').value = '';
+    document.getElementById('s-nota').value = '';
+    setDates();
+    clearBtn('btn-s');
+  }, 1200);
+}
+
+// SUBMIT PRODUCTO
+function submitProducto() {
+  let ok = true;
+  const producto = getVal('p-producto');
+  setErr('e-p-producto', !producto); if (!producto) ok = false;
+  const pago = getChecked('p-pago');
+  setErr('e-p-pago', !pago); if (!pago) ok = false;
+  const monto = getVal('p-monto');
+  setErr('e-p-monto', !monto); if (!monto) ok = false;
+  if (!ok) return;
+
+  const clienta = getVal('p-clienta') || 'Sin nombre';
+  const cantidad = getVal('p-cantidad') || '1';
+  const fecha = getVal('p-fecha');
+  const nota = getVal('p-nota');
+
+  const btn = document.getElementById('btn-p');
+  btn.dataset.orig = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  sendToSheets({
+    tipo: 'Venta producto',
+    fecha, clienta,
+    detalle: producto + (cantidad !== '1' ? ' (x'+cantidad+')' : ''),
+    medio_pago: pago,
+    monto,
+    nota,
+    origen: 'Manual'
+  });
+
+  setTimeout(() => {
+    showToast('✦ Venta registrada');
+    document.getElementById('p-clienta').value = '';
+    document.getElementById('p-producto').value = '';
+    document.getElementById('p-cantidad').value = '1';
+    document.querySelectorAll('input[name="p-pago"]').forEach(r => r.checked = false);
+    document.getElementById('p-monto').value = '';
+    document.getElementById('p-nota').value = '';
+    setDates();
+    clearBtn('btn-p');
+  }, 1200);
+}
+
+// SUBMIT GASTO
+function submitGasto() {
+  let ok = true;
+  const cat = getVal('g-categoria');
+  setErr('e-g-cat', !cat); if (!cat) ok = false;
+  const det = getVal('g-detalle');
+  setErr('e-g-det', !det); if (!det) ok = false;
+  const monto = getVal('g-monto');
+  setErr('e-g-monto', !monto); if (!monto) ok = false;
+  if (!ok) return;
+
+  const fecha = getVal('g-fecha');
+  const nota = getVal('g-nota');
+
+  const btn = document.getElementById('btn-g');
+  btn.dataset.orig = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  sendToSheets({
+    tipo: 'Gasto',
+    fecha,
+    clienta: '—',
+    detalle: cat + ': ' + det,
+    medio_pago: '—',
+    monto: '-' + monto,
+    nota,
+    origen: 'Manual'
+  });
+
+  setTimeout(() => {
+    showToast('✦ Gasto registrado');
+    document.getElementById('g-categoria').value = '';
+    document.getElementById('g-detalle').value = '';
+    document.getElementById('g-monto').value = '';
+    document.getElementById('g-nota').value = '';
+    setDates();
+    clearBtn('btn-g');
+  }, 1200);
+}
+</script>
+</body>
+</html>
