@@ -273,7 +273,7 @@ input.bad,select.bad{border-color:#e87070}
 <script>
 const KOOL_WA    = '5492284384335';
 // ↓ Reemplazá esta línea con tu URL de Google Apps Script después del paso 2
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzlRpJLnr1g9jbuPv_x_6URTbUa3wXroVJVojp3eSW8k0w6LpfajhVXaA2-wltGMALL/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzJafO8D0ad3OtUG42AIIxm_UN8CTmz3Ff2cx31QPajD7M3CkLqbK2VdPMrLLxrc14/exec';
 
 document.querySelectorAll('.day-card').forEach(card => {
   card.addEventListener('click', () => {
@@ -331,18 +331,29 @@ document.getElementById('form').addEventListener('submit', async function(e) {
   document.getElementById('wa-link').href = `https://wa.me/${KOOL_WA}?text=${waMsg}`;
   document.getElementById('success-msg').innerHTML = `Recibimos tu consulta, <strong>${nombre}</strong>.<br>Te escribiremos en breve para ofrecerte las mejores opciones para tu turno.`;
 
+  // Envío via iframe oculto — único método que funciona con Google Apps Script sin CORS
   try {
-    const form = new FormData();
-    form.append('nombre',      nombre);
-    form.append('whatsapp',    wa);
-    form.append('servicio',    servicio);
-    form.append('largo',       largo);
-    form.append('rulo',        rulo);
-    form.append('primera_vez', primera);
-    form.append('dias',        dias);
-    form.append('nota',        nota);
-    form.append('fecha',       fecha);
-    await fetch(SHEETS_URL, { method:'POST', mode:'no-cors', body: form });
+    const iframe = document.createElement('iframe');
+    iframe.name = 'hidden_iframe';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    const hiddenForm = document.createElement('form');
+    hiddenForm.method = 'POST';
+    hiddenForm.action = SHEETS_URL;
+    hiddenForm.target = 'hidden_iframe';
+
+    const fields = {nombre, whatsapp:wa, servicio, largo, rulo, primera_vez:primera, dias, nota, fecha};
+    for (const [key, val] of Object.entries(fields)) {
+      const input = document.createElement('input');
+      input.type  = 'hidden';
+      input.name  = key;
+      input.value = val;
+      hiddenForm.appendChild(input);
+    }
+    document.body.appendChild(hiddenForm);
+    hiddenForm.submit();
+    setTimeout(() => { hiddenForm.remove(); iframe.remove(); }, 3000);
   } catch(_) {}
 
   document.getElementById('form-card').classList.add('gone');
