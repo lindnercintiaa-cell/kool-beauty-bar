@@ -295,16 +295,40 @@ function switchTab(name) {
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('show'));
   document.getElementById('tab-'+name).classList.add('show');
   if (name === 'agenda') renderAgenda();
-  if (name === 'pendientes') renderPendientes();
+  if (name === 'pendientes') cargarConsultas();
   if (name === 'config') renderTiempos();
 }
 
-// ── DATOS DE EJEMPLO (se reemplazan con los del Sheet) ─────────
-const consultasEjemplo = [
-  { nombre:'Laura Martínez', whatsapp:'2284401234', servicio:'Mechas', largo:'Largo', rulo:'Ondas suaves', primera:'Sí, primera vez', dias:'Martes, Jueves', nota:'Quiere aclarar un poco', fecha:'2026-05-10', estado:'Pendiente' },
-  { nombre:'Sofía Ramos', whatsapp:'2284567890', servicio:'Corte y tratamiento', largo:'Medio', rulo:'Rulos definidos', primera:'No, ya vine antes', dias:'Miércoles, Viernes', nota:'', fecha:'2026-05-10', estado:'Pendiente' },
-  { nombre:'Valentina Cruz', whatsapp:'2284991122', servicio:'Corte', largo:'Corto', rulo:'Rulos apretados', primera:'No, ya vine antes', dias:'Lunes', nota:'Le gustan los rizos bien definidos', fecha:'2026-05-09', estado:'Pendiente' },
-];
+// ── SHEETS CONFIG ─────────────────────────────────────────────
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzJafO8D0ad3OtUG42AIIxm_UN8CTmz3Ff2cx31QPajD7M3CkLqbK2VdPMrLLxrc14/exec';
+const SECRET_KEY = 'kool2026';
+let consultasEjemplo = [];
+
+async function cargarConsultas() {
+  const container = document.getElementById('lista-pendientes');
+  container.innerHTML = `<div class="empty"><div class="empty-icon" style="animation:pulse 1.5s infinite">✦</div><div class="empty-text">Cargando consultas...</div></div>`;
+  try {
+    const url = `${SHEETS_URL}?action=getConsultas&key=${SECRET_KEY}`;
+    const res  = await fetch(url);
+    const data = await res.json();
+    consultasEjemplo = data.map(row => ({
+      nombre:   row['Nombre']           || '',
+      whatsapp: row['WhatsApp']         || '',
+      servicio: row['Servicio']         || '',
+      largo:    row['Largo']            || '',
+      rulo:     row['Tipo de rulo']     || '',
+      primera:  row['Primera vez']      || '',
+      dias:     row['Días disponibles'] || '',
+      nota:     row['Nota']             || '',
+      fecha:    row['Fecha']            || '',
+      estado:   row['Estado']           || 'Pendiente',
+    })).filter(c => c.nombre);
+  } catch(err) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">No se pudieron cargar las consultas.<br>Verificá tu conexión.</div></div>`;
+    return;
+  }
+  renderPendientes();
+}
 
 // ── SUGERENCIA IA ──────────────────────────────────────────────
 function sugerirSlots(consulta) {
@@ -552,7 +576,7 @@ function showToast(msg) {
 
 // ── INIT ───────────────────────────────────────────────────────
 document.getElementById('nt-fecha').value = new Date().toISOString().split('T')[0];
-renderPendientes();
+cargarConsultas();
 </script>
 </body>
 </html>
