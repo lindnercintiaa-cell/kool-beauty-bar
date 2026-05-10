@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kool Beauty Bar · Reservá tu turno</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose:     #E8A4B8;
+  --rose-lt:  #F5D6E2;
+  --rose-dk:  #C2637A;
+  --lilac:    #C4A8D4;
+  --lilac-lt: #EDE4F5;
+  --lilac-dk: #8B5FA0;
+  --sage:     #A8C4A2;
+  --sage-lt:  #DFF0DB;
+  --sage-dk:  #5A8A52;
+  --sky:      #A4C8E0;
+  --sky-lt:   #D6ECF5;
+  --sky-dk:   #3A7FA0;
+  --bg:       #FDF6FA;
+  --surface:  #FFFFFF;
+  --text:     #2D1F2E;
+  --muted:    #8A6E80;
+  --border:   rgba(196,168,212,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;font-weight:300;color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 55% 40% at 5% 10%,rgba(232,164,184,.18) 0%,transparent 70%),radial-gradient(ellipse 45% 35% at 95% 20%,rgba(196,168,212,.16) 0%,transparent 65%),radial-gradient(ellipse 50% 40% at 80% 85%,rgba(164,200,224,.14) 0%,transparent 65%),radial-gradient(ellipse 40% 35% at 15% 90%,rgba(168,196,162,.14) 0%,transparent 60%);pointer-events:none;z-index:0}
+.page-wrap{position:relative;z-index:1;max-width:580px;margin:0 auto;padding:52px 24px 80px}
+
+/* Header */
+.header{text-align:center;margin-bottom:44px;animation:fadeDown .8s ease both}
+.header-gems{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px}
+.gem{width:8px;height:8px;border-radius:50%}
+.gem.rose{background:var(--rose)}.gem.lilac{background:var(--lilac)}.gem.sage{background:var(--sage)}.gem.sky{background:var(--sky)}
+.gem-line{height:1px;width:40px;opacity:.5}
+.logo{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;letter-spacing:5px;line-height:1;color:var(--text);margin-bottom:5px}
+.logo em{font-style:italic;font-weight:400;background:linear-gradient(135deg,var(--rose-dk),var(--lilac-dk));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tagline{font-size:11px;letter-spacing:3.5px;text-transform:uppercase;color:var(--muted);font-weight:400}
+.header-desc{margin-top:18px;font-family:'Playfair Display',serif;font-style:italic;font-size:17px;line-height:1.65;color:var(--muted)}
+
+/* Card */
+.form-card{background:var(--surface);border-radius:24px;padding:40px 36px;border:1px solid var(--border);box-shadow:0 4px 40px rgba(196,168,212,.12);animation:fadeUp .8s .2s ease both}
+@media(max-width:480px){.form-card{padding:28px 18px}.logo{font-size:34px}}
+
+/* Section labels */
+.section-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:500;margin-bottom:18px;margin-top:30px;display:flex;align-items:center;gap:10px}
+.section-label:first-child{margin-top:0}
+.section-label.rose{color:var(--rose-dk)}.section-label.rose::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(194,99,122,.25),transparent)}
+.section-label.lilac{color:var(--lilac-dk)}.section-label.lilac::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(139,95,160,.25),transparent)}
+.section-label.sky{color:var(--sky-dk)}.section-label.sky::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(58,127,160,.25),transparent)}
+
+/* Fields */
+.field{margin-bottom:20px}
+label{display:block;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text);font-weight:500;margin-bottom:8px}
+.opt{font-weight:300;color:var(--muted);text-transform:none;letter-spacing:0;font-size:11px}
+input[type=text],input[type=tel],select,textarea{width:100%;background:#FAFAFA;border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:300;color:var(--text);outline:none;transition:border-color .2s,background .2s;appearance:none;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--lilac);background:var(--lilac-lt)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+.select-wrap{position:relative}.select-wrap::after{content:'↓';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--lilac-dk);pointer-events:none;font-size:13px}
+#otro-wrap{margin-top:10px;display:none}#otro-wrap.show{display:block}
+
+/* Pills */
+.pill-group{display:flex;flex-wrap:wrap;gap:8px}
+.pill-opt{display:inline-flex}
+.pill-opt input{position:absolute;opacity:0;width:0;height:0}
+.pill-lbl{display:inline-block;padding:8px 18px;border-radius:50px;border:1.5px solid var(--border);background:#FAFAFA;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;color:var(--muted);cursor:pointer;transition:all .18s;white-space:nowrap}
+.pill-opt:hover .pill-lbl{border-color:var(--lilac);color:var(--lilac-dk)}
+.pill-opt.rose input:checked+.pill-lbl{background:var(--rose-lt);border-color:var(--rose-dk);color:var(--rose-dk);font-weight:500}
+.pill-opt.lilac input:checked+.pill-lbl{background:var(--lilac-lt);border-color:var(--lilac-dk);color:var(--lilac-dk);font-weight:500}
+.pill-opt.sky input:checked+.pill-lbl{background:var(--sky-lt);border-color:var(--sky-dk);color:var(--sky-dk);font-weight:500}
+.pill-opt.sage input:checked+.pill-lbl{background:var(--sage-lt);border-color:var(--sage-dk);color:var(--sage-dk);font-weight:500}
+
+/* Days */
+.days-hint{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6;font-family:'Playfair Display',serif;font-style:italic}
+.days-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.day-card{border:1.5px solid var(--border);border-radius:14px;padding:13px 15px;background:#FAFAFA;cursor:pointer;transition:all .2s;user-select:none}
+.day-card:hover{border-color:var(--lilac)}
+.day-card.checked{border-color:var(--lilac-dk);background:var(--lilac-lt)}
+.day-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.day-name{font-size:14px;font-weight:500;color:var(--text)}
+.day-check{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(196,168,212,.5);display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;font-size:11px;color:transparent}
+.day-card.checked .day-check{background:var(--lilac-dk);border-color:var(--lilac-dk);color:white}
+.day-hours{font-size:11px;color:var(--muted)}
+.day-card.checked .day-hours{color:var(--lilac-dk)}
+.day-card input{display:none}
+
+/* Submit */
+.submit-btn{width:100%;margin-top:34px;padding:16px;background:linear-gradient(135deg,var(--rose-dk),var(--lilac-dk));color:white;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:13px;letter-spacing:2.5px;text-transform:uppercase;font-weight:500;cursor:pointer;transition:all .25s}
+.submit-btn:hover{opacity:.88;transform:translateY(-1px)}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+/* Success */
+.success-screen{display:none;text-align:center;padding:40px 20px;animation:fadeUp .6s ease both}
+.success-screen.show{display:block}
+.form-card.gone{display:none}
+.success-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:400;font-style:italic;color:var(--lilac-dk);margin-bottom:14px;margin-top:16px}
+.success-text{font-size:16px;color:var(--muted);line-height:1.75;margin-bottom:28px;font-family:'Playfair Display',serif;font-style:italic}
+.wa-btn{display:inline-flex;align-items:center;gap:10px;padding:14px 30px;background:#25D366;color:white;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;letter-spacing:1px;text-decoration:none;transition:all .2s}
+.wa-btn:hover{background:#1ebe59;transform:translateY(-1px)}
+.wa-btn svg{width:20px;height:20px;fill:white}
+
+/* Footer */
+.footer-note{text-align:center;margin-top:30px;font-size:12px;color:var(--muted);font-family:'Playfair Display',serif;font-style:italic;animation:fadeUp .8s .4s ease both}
+
+/* Errors */
+.err{font-size:11px;color:#c0392b;margin-top:5px;display:none}
+.err.on{display:block}
+input.bad,select.bad{border-color:#e87070}
+
+@keyframes fadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <div class="header">
+    <div class="header-gems">
+      <div class="gem-line" style="background:linear-gradient(90deg,var(--rose),var(--lilac))"></div>
+      <div class="gem rose"></div>
+      <div class="gem lilac"></div>
+      <div class="gem sage"></div>
+      <div class="gem sky"></div>
+      <div class="gem-line" style="background:linear-gradient(90deg,var(--sky),var(--sage))"></div>
+    </div>
+    <div class="logo">KOOL <em>beauty</em> bar</div>
+    <div class="tagline">Especialistas en rulos · Olavarría</div>
+    <p class="header-desc">Contanos sobre vos y tu pelo.<br>Te escribiremos en breve para ofrecerte<br>las mejores opciones para tu turno.</p>
+  </div>
+
+  <div class="form-card" id="form-card">
+    <form id="form" novalidate>
+
+      <div class="section-label rose">Tus datos</div>
+
+      <div class="field">
+        <label for="nombre">Nombre completo</label>
+        <input type="text" id="nombre" placeholder="¿Cómo te llamás?" autocomplete="name">
+        <div class="err" id="e-nombre">Por favor ingresá tu nombre.</div>
+      </div>
+
+      <div class="field">
+        <label for="whatsapp">WhatsApp</label>
+        <input type="tel" id="whatsapp" placeholder="Ej: 2284 12 3456" autocomplete="tel">
+        <div class="err" id="e-wa">Por favor ingresá tu número.</div>
+      </div>
+
+      <div class="section-label lilac">Tu pelo</div>
+
+      <div class="field">
+        <label for="servicio">¿Qué servicio buscás?</label>
+        <div class="select-wrap">
+          <select id="servicio">
+            <option value="">— Elegí una opción —</option>
+            <option>Corte y tratamiento</option>
+            <option>Corte</option>
+            <option>Color</option>
+            <option>Color en raíces</option>
+            <option>Color en cabello completo</option>
+            <option>Corte y color</option>
+            <option>Mechas</option>
+            <option>Tratamientos</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="err" id="e-serv">Por favor elegí un servicio.</div>
+        <div id="otro-wrap">
+          <input type="text" id="otro-texto" placeholder="Contanos qué necesitás...">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Largo de cabello</label>
+        <div class="pill-group">
+          <label class="pill-opt rose"><input type="radio" name="largo" value="Corto (hasta el mentón)"><span class="pill-lbl">Corto</span></label>
+          <label class="pill-opt rose"><input type="radio" name="largo" value="Medio (hombros)"><span class="pill-lbl">Medio</span></label>
+          <label class="pill-opt rose"><input type="radio" name="largo" value="Largo (debajo de hombros)"><span class="pill-lbl">Largo</span></label>
+          <label class="pill-opt rose"><input type="radio" name="largo" value="Muy largo (media espalda o más)"><span class="pill-lbl">Muy largo</span></label>
+        </div>
+        <div class="err" id="e-largo">Por favor indicá el largo.</div>
+      </div>
+
+      <div class="field">
+        <label>Tipo de rulo <span class="opt">· opcional</span></label>
+        <div class="pill-group">
+          <label class="pill-opt lilac"><input type="radio" name="rulo" value="Ondas suaves (2A/2B)"><span class="pill-lbl">Ondas suaves</span></label>
+          <label class="pill-opt lilac"><input type="radio" name="rulo" value="Rulos definidos (2C/3A)"><span class="pill-lbl">Rulos definidos</span></label>
+          <label class="pill-opt lilac"><input type="radio" name="rulo" value="Rulos apretados (3B/3C)"><span class="pill-lbl">Rulos apretados</span></label>
+          <label class="pill-opt lilac"><input type="radio" name="rulo" value="No sé mi tipo"><span class="pill-lbl">No sé mi tipo</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>¿Es tu primera vez en Kool?</label>
+        <div class="pill-group">
+          <label class="pill-opt sage"><input type="radio" name="primera" value="Sí, primera vez"><span class="pill-lbl">Sí, primera vez</span></label>
+          <label class="pill-opt sage"><input type="radio" name="primera" value="No, ya vine antes"><span class="pill-lbl">Ya vine antes</span></label>
+        </div>
+        <div class="err" id="e-primera">Por favor indicá si es tu primera vez.</div>
+      </div>
+
+      <div class="section-label sky">Días disponibles</div>
+      <p class="days-hint">Marcá los días que te quedan bien.</p>
+
+      <div class="days-grid">
+        <div class="day-card" id="dc-lunes">
+          <div class="day-top"><span class="day-name">Lunes</span><span class="day-check">✓</span></div>
+          <div class="day-hours">13:30 — 16:30 hs</div>
+          <input type="checkbox" name="dias" value="Lunes">
+        </div>
+        <div class="day-card" id="dc-miercoles">
+          <div class="day-top"><span class="day-name">Miércoles</span><span class="day-check">✓</span></div>
+          <div class="day-hours">13:30 — 16:30 hs</div>
+          <input type="checkbox" name="dias" value="Miércoles">
+        </div>
+        <div class="day-card" id="dc-viernes">
+          <div class="day-top"><span class="day-name">Viernes</span><span class="day-check">✓</span></div>
+          <div class="day-hours">13:30 — 16:30 hs</div>
+          <input type="checkbox" name="dias" value="Viernes">
+        </div>
+        <div class="day-card" id="dc-martes">
+          <div class="day-top"><span class="day-name">Martes</span><span class="day-check">✓</span></div>
+          <div class="day-hours">14:00 — 20:00 hs</div>
+          <input type="checkbox" name="dias" value="Martes">
+        </div>
+        <div class="day-card" id="dc-jueves">
+          <div class="day-top"><span class="day-name">Jueves</span><span class="day-check">✓</span></div>
+          <div class="day-hours">14:00 — 20:00 hs</div>
+          <input type="checkbox" name="dias" value="Jueves">
+        </div>
+        <div class="day-card" id="dc-sabado">
+          <div class="day-top"><span class="day-name">Sábado</span><span class="day-check">✓</span></div>
+          <div class="day-hours">9:30 — 14:30 hs · opcional</div>
+          <input type="checkbox" name="dias" value="Sábado">
+        </div>
+      </div>
+      <div class="err" id="e-dias" style="margin-top:8px">Por favor elegí al menos un día.</div>
+
+      <div class="field" style="margin-top:22px">
+        <label for="nota">Algo más que quieras contarnos <span class="opt">· opcional</span></label>
+        <textarea id="nota" rows="3" placeholder="Estado de tu pelo, referencias, alergias, lo que quieras..."></textarea>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submit-btn">Enviar mi consulta</button>
+    </form>
+  </div>
+
+  <div class="success-screen" id="success-screen">
+    <div style="display:flex;justify-content:center;gap:8px;margin-bottom:4px">
+      <div class="gem rose" style="width:12px;height:12px"></div>
+      <div class="gem lilac" style="width:12px;height:12px"></div>
+      <div class="gem sage" style="width:12px;height:12px"></div>
+      <div class="gem sky" style="width:12px;height:12px"></div>
+    </div>
+    <div class="success-title">¡Gracias!</div>
+    <p class="success-text" id="success-msg">
+      Recibimos tu consulta.<br>
+      Te escribiremos en breve para ofrecerte las mejores opciones para tu turno.
+    </p>
+    <a href="#" id="wa-link" class="wa-btn" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Escribir a KOOL
+    </a>
+  </div>
+
+  <div class="footer-note">Kool Beauty Bar · Especialistas en rulos · Olavarría</div>
+</div>
+
+<script>
+const KOOL_WA    = '5492284384335';
+// ↓ Reemplazá esta línea con tu URL de Google Apps Script después del paso 2
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzlRpJLnr1g9jbuPv_x_6URTbUa3wXroVJVojp3eSW8k0w6LpfajhVXaA2-wltGMALL/exec';
+
+document.querySelectorAll('.day-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const cb = card.querySelector('input');
+    cb.checked = !cb.checked;
+    card.classList.toggle('checked', cb.checked);
+  });
+});
+
+document.getElementById('servicio').addEventListener('change', function() {
+  document.getElementById('otro-wrap').classList.toggle('show', this.value === 'otro');
+});
+
+function validate() {
+  let ok = true;
+  const req = (id, errId) => {
+    const v = document.getElementById(id).value.trim();
+    document.getElementById(errId).classList.toggle('on', !v);
+    document.getElementById(id).classList.toggle('bad', !v);
+    if (!v) ok = false;
+  };
+  req('nombre','e-nombre');
+  req('whatsapp','e-wa');
+  const serv = document.getElementById('servicio').value;
+  document.getElementById('e-serv').classList.toggle('on',!serv);
+  document.getElementById('servicio').classList.toggle('bad',!serv);
+  if (!serv) ok = false;
+  if (!document.querySelector('input[name=largo]:checked')) { document.getElementById('e-largo').classList.add('on'); ok=false; } else document.getElementById('e-largo').classList.remove('on');
+  if (!document.querySelector('input[name=primera]:checked')) { document.getElementById('e-primera').classList.add('on'); ok=false; } else document.getElementById('e-primera').classList.remove('on');
+  const dias = document.querySelectorAll('input[name=dias]:checked');
+  document.getElementById('e-dias').classList.toggle('on', dias.length===0);
+  if (!dias.length) ok=false;
+  return ok;
+}
+
+document.getElementById('form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  if (!validate()) return;
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'Enviando...';
+
+  const nombre   = document.getElementById('nombre').value.trim();
+  const wa       = document.getElementById('whatsapp').value.trim();
+  const servEl   = document.getElementById('servicio');
+  const servicio = servEl.value==='otro' ? (document.getElementById('otro-texto').value.trim()||'Otro') : servEl.options[servEl.selectedIndex].text;
+  const largo    = document.querySelector('input[name=largo]:checked').value;
+  const ruloEl   = document.querySelector('input[name=rulo]:checked');
+  const rulo     = ruloEl ? ruloEl.value : '—';
+  const primera  = document.querySelector('input[name=primera]:checked').value;
+  const dias     = [...document.querySelectorAll('input[name=dias]:checked')].map(i=>i.value).join(', ');
+  const nota     = document.getElementById('nota').value.trim()||'—';
+  const fecha    = new Date().toLocaleString('es-AR',{timeZone:'America/Argentina/Buenos_Aires'});
+
+  const waMsg = encodeURIComponent(`✦ Nueva consulta — Kool Beauty Bar\n\nNombre: ${nombre}\nWhatsApp: ${wa}\nServicio: ${servicio}\nLargo: ${largo}\nTipo de rulo: ${rulo}\nPrimera vez: ${primera}\nDías disponibles: ${dias}\nNota: ${nota}\nFecha: ${fecha}`);
+  document.getElementById('wa-link').href = `https://wa.me/${KOOL_WA}?text=${waMsg}`;
+  document.getElementById('success-msg').innerHTML = `Recibimos tu consulta, <strong>${nombre}</strong>.<br>Te escribiremos en breve para ofrecerte las mejores opciones para tu turno.`;
+
+  if (SHEETS_URL !== 'https://script.google.com/macros/s/AKfycbzlRpJLnr1g9jbuPv_x_6URTbUa3wXroVJVojp3eSW8k0w6LpfajhVXaA2-wltGMALL/exec') {
+    try {
+      await fetch(SHEETS_URL, {
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({nombre,whatsapp:wa,servicio,largo,rulo,primera_vez:primera,dias,nota,fecha})
+      });
+    } catch(_) {}
+  }
+
+  document.getElementById('form-card').classList.add('gone');
+  document.getElementById('success-screen').classList.add('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+</script>
+</body>
+</html>
