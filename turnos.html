@@ -311,17 +311,26 @@ async function cargarConsultas() {
     const url = `${SHEETS_URL}?action=getConsultas&key=${SECRET_KEY}`;
     const res  = await fetch(url);
     const data = await res.json();
+    // Busca columna sin importar mayúsculas ni espacios extras
+    function col(row, ...names) {
+      const keys = Object.keys(row);
+      for (const name of names) {
+        const found = keys.find(k => k.trim().toLowerCase() === name.toLowerCase());
+        if (found) return String(row[found] || '').trim();
+      }
+      return '';
+    }
     consultasEjemplo = data.map(row => ({
-      nombre:   row['Nombre']           || '',
-      whatsapp: row['WhatsApp']         || '',
-      servicio: row['Servicio']         || '',
-      largo:    row['Largo']            || '',
-      rulo:     row['Tipo de rulo']     || '',
-      primera:  row['Primera vez']      || '',
-      dias:     row['Días disponibles'] || '',
-      nota:     row['Nota']             || '',
-      fecha:    row['Fecha']            || '',
-      estado:   row['Estado']           || 'Pendiente',
+      nombre:   col(row, 'nombre'),
+      whatsapp: col(row, 'whatsapp'),
+      servicio: col(row, 'servicio'),
+      largo:    col(row, 'largo cabello', 'largo'),
+      rulo:     col(row, 'tipo de rulo'),
+      primera:  col(row, 'primera vez'),
+      dias:     col(row, 'días disponibles', 'dias disponibles'),
+      nota:     col(row, 'comentarios', 'nota'),
+      fecha:    col(row, 'fecha'),
+      estado:   col(row, 'turno dado?', 'estado') || 'Pendiente',
     })).filter(c => c.nombre);
   } catch(err) {
     container.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">No se pudieron cargar las consultas.<br>Verificá tu conexión.</div></div>`;
