@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kool Beauty Bar · Turnos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose:#E8A4B8;--rose-lt:#F5D6E2;--rose-dk:#C2637A;
+  --lilac:#C4A8D4;--lilac-lt:#EDE4F5;--lilac-dk:#8B5FA0;
+  --sage:#A8C4A2;--sage-lt:#DFF0DB;--sage-dk:#5A8A52;
+  --sky:#A4C8E0;--sky-lt:#D6ECF5;--sky-dk:#3A7FA0;
+  --amber:#E8C97A;--amber-lt:#FBF3D6;--amber-dk:#B8922A;
+  --bg:#FDF6FA;--surface:#FFFFFF;--text:#2D1F2E;--muted:#8A6E80;--border:rgba(196,168,212,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;font-weight:300;color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 55% 40% at 5% 10%,rgba(232,164,184,.13) 0%,transparent 70%),radial-gradient(ellipse 45% 35% at 95% 20%,rgba(196,168,212,.11) 0%,transparent 65%);pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:40px 20px 80px}
+
+/* Header */
+.header{text-align:center;margin-bottom:32px}
+.gems{display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:10px}
+.gem{width:7px;height:7px;border-radius:50%}
+.gline{height:1px;width:36px;opacity:.4}
+.logo{font-family:'Playfair Display',serif;font-size:34px;font-weight:700;letter-spacing:4px;color:var(--text);margin-bottom:3px}
+.logo em{font-style:italic;font-weight:400;background:linear-gradient(135deg,var(--rose-dk),var(--lilac-dk));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted)}
+
+/* Tabs */
+.tabs{display:flex;gap:8px;margin-bottom:28px;border-bottom:1.5px solid var(--border);padding-bottom:0}
+.tab{padding:10px 20px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:all .2s}
+.tab:hover{color:var(--lilac-dk)}
+.tab.active{color:var(--lilac-dk);border-bottom-color:var(--lilac-dk)}
+
+.tab-content{display:none}.tab-content.show{display:block}
+
+/* Cards */
+.card{background:var(--surface);border-radius:18px;padding:24px;border:1px solid var(--border);box-shadow:0 2px 20px rgba(196,168,212,.08);margin-bottom:16px}
+
+/* Section labels */
+.slabel{font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:500;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.slabel.rose{color:var(--rose-dk)}.slabel.rose::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(194,99,122,.2),transparent)}
+.slabel.lilac{color:var(--lilac-dk)}.slabel.lilac::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(139,95,160,.2),transparent)}
+.slabel.sage{color:var(--sage-dk)}.slabel.sage::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(90,138,82,.2),transparent)}
+.slabel.amber{color:var(--amber-dk)}.slabel.amber::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(184,146,42,.2),transparent)}
+
+/* Consulta card */
+.consulta{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;transition:all .2s}
+.consulta:hover{border-color:var(--lilac);box-shadow:0 4px 16px rgba(196,168,212,.15)}
+.consulta-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.consulta-nombre{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;color:var(--text)}
+.consulta-fecha{font-size:11px;color:var(--muted);margin-top:2px}
+.badge{display:inline-block;padding:4px 12px;border-radius:50px;font-size:11px;font-weight:500}
+.badge.pendiente{background:var(--amber-lt);color:var(--amber-dk)}
+.badge.confirmado{background:var(--sage-lt);color:var(--sage-dk)}
+.badge.atendido{background:var(--lilac-lt);color:var(--lilac-dk)}
+
+.consulta-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+@media(max-width:500px){.consulta-info{grid-template-columns:1fr}}
+.info-item{font-size:13px;color:var(--muted)}
+.info-item strong{color:var(--text);font-weight:500}
+
+/* IA suggestion box */
+.ia-box{background:var(--lilac-lt);border:1.5px solid rgba(139,95,160,.2);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.ia-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ia-dot{width:8px;height:8px;border-radius:50%;background:var(--lilac-dk);animation:pulse 2s infinite}
+.ia-title{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--lilac-dk);font-weight:500}
+.ia-text{font-size:14px;color:var(--text);line-height:1.6}
+.ia-slots{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.slot-btn{padding:7px 14px;border-radius:50px;border:1.5px solid var(--lilac);background:var(--surface);font-size:12px;font-weight:500;color:var(--lilac-dk);cursor:pointer;transition:all .18s}
+.slot-btn:hover,.slot-btn.selected{background:var(--lilac-dk);color:white;border-color:var(--lilac-dk)}
+
+.consulta-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:9px 18px;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:.5px;cursor:pointer;transition:all .2s;border:none}
+.btn-wa{background:#25D366;color:white;display:flex;align-items:center;gap:6px}
+.btn-wa:hover{background:#1ebe59}
+.btn-wa svg{width:15px;height:15px;fill:white}
+.btn-confirmar{background:var(--sage-lt);color:var(--sage-dk);border:1.5px solid var(--sage)}
+.btn-confirmar:hover{background:var(--sage-dk);color:white}
+.btn-atendido{background:var(--lilac-lt);color:var(--lilac-dk);border:1.5px solid var(--lilac)}
+.btn-atendido:hover{background:var(--lilac-dk);color:white}
+
+/* Agenda semanal */
+.week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.week-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;color:var(--text)}
+.week-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;color:var(--muted);transition:all .2s;display:flex;align-items:center;justify-content:center}
+.week-btn:hover{border-color:var(--lilac-dk);color:var(--lilac-dk)}
+
+.agenda-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.dia-col{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;overflow:hidden}
+.dia-header{padding:10px 12px;text-align:center;border-bottom:1.5px solid var(--border)}
+.dia-nombre{font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--text)}
+.dia-fecha-num{font-family:'Playfair Display',serif;font-size:22px;color:var(--lilac-dk)}
+.dia-horario{font-size:10px;color:var(--muted);margin-top:2px}
+.dia-col.hoy .dia-header{background:var(--lilac-lt)}
+.dia-col.hoy .dia-nombre{color:var(--lilac-dk)}
+.dia-col.cerrado{opacity:.45}
+.dia-col.cerrado .dia-header{background:#f5f5f5}
+
+.dia-turnos{padding:8px}
+.turno-bloque{background:var(--rose-lt);border-left:3px solid var(--rose-dk);border-radius:8px;padding:7px 9px;margin-bottom:7px;cursor:pointer;transition:all .2s}
+.turno-bloque:hover{background:var(--rose);transform:scale(1.02)}
+.turno-hora{font-size:11px;font-weight:500;color:var(--rose-dk)}
+.turno-nombre{font-size:12px;color:var(--text);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.turno-serv{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dia-vacio{padding:12px 8px;text-align:center;font-size:11px;color:var(--muted);font-style:italic}
+
+/* Config tiempos */
+.tiempos-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:500px){.tiempos-grid{grid-template-columns:1fr}}
+.tiempo-item{display:flex;flex-direction:column;gap:4px}
+.tiempo-item label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text);font-weight:500}
+.tiempo-input-wrap{display:flex;align-items:center;gap:8px}
+.tiempo-input-wrap input{width:80px;padding:8px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;text-align:center;outline:none;background:#FAFAFA}
+.tiempo-input-wrap input:focus{border-color:var(--lilac)}
+.tiempo-input-wrap span{font-size:12px;color:var(--muted)}
+
+/* Nuevo turno manual */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:500px){.form-grid{grid-template-columns:1fr}}
+.field{margin-bottom:0}
+.field label{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text);font-weight:500;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;background:#FAFAFA;border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .2s;appearance:none;-webkit-appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--lilac)}
+.select-wrap{position:relative}.select-wrap::after{content:'↓';position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--lilac-dk);pointer-events:none;font-size:12px}
+.save-btn{margin-top:16px;padding:12px 28px;background:linear-gradient(135deg,var(--rose-dk),var(--lilac-dk));color:white;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:500;cursor:pointer;transition:all .25s}
+.save-btn:hover{opacity:.85;transform:translateY(-1px)}
+
+/* Toast */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:white;padding:12px 24px;border-radius:50px;font-size:13px;transition:transform .3s;z-index:100;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Empty state */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-icon{font-size:36px;margin-bottom:12px}
+.empty-text{font-family:'Playfair Display',serif;font-style:italic;font-size:16px}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="gems">
+      <div class="gline" style="background:linear-gradient(90deg,var(--rose),var(--lilac))"></div>
+      <div class="gem" style="background:var(--rose)"></div>
+      <div class="gem" style="background:var(--lilac)"></div>
+      <div class="gem" style="background:var(--sage)"></div>
+      <div class="gem" style="background:var(--sky)"></div>
+      <div class="gline" style="background:linear-gradient(90deg,var(--sky),var(--sage))"></div>
+    </div>
+    <div class="logo">KOOL <em>beauty</em> bar</div>
+    <div class="subtitle">Panel de turnos</div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('pendientes')">Consultas pendientes</div>
+    <div class="tab" onclick="switchTab('agenda')">Agenda semanal</div>
+    <div class="tab" onclick="switchTab('nuevo')">Nuevo turno</div>
+    <div class="tab" onclick="switchTab('config')">Tiempos</div>
+  </div>
+
+  <!-- TAB: PENDIENTES -->
+  <div class="tab-content show" id="tab-pendientes">
+    <div id="lista-pendientes"></div>
+  </div>
+
+  <!-- TAB: AGENDA -->
+  <div class="tab-content" id="tab-agenda">
+    <div class="week-nav">
+      <button class="week-btn" onclick="cambiarSemana(-1)">←</button>
+      <div class="week-title" id="week-title"></div>
+      <button class="week-btn" onclick="cambiarSemana(1)">→</button>
+    </div>
+    <div class="agenda-grid" id="agenda-grid"></div>
+  </div>
+
+  <!-- TAB: NUEVO TURNO -->
+  <div class="tab-content" id="tab-nuevo">
+    <div class="card">
+      <div class="slabel rose">Agregar turno manualmente</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Nombre de la clienta</label>
+          <input type="text" id="nt-nombre" placeholder="Ej: María González">
+        </div>
+        <div class="field">
+          <label>WhatsApp</label>
+          <input type="tel" id="nt-wa" placeholder="Ej: 2284 123456">
+        </div>
+        <div class="field">
+          <label>Servicio</label>
+          <div class="select-wrap">
+            <select id="nt-servicio">
+              <option value="">— Elegí —</option>
+              <option>Corte</option>
+              <option>Corte y tratamiento</option>
+              <option>Color</option>
+              <option>Color en raíces</option>
+              <option>Color en cabello completo</option>
+              <option>Corte y color</option>
+              <option>Mechas</option>
+              <option>Tratamiento</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Fecha</label>
+          <input type="date" id="nt-fecha">
+        </div>
+        <div class="field">
+          <label>Hora</label>
+          <input type="time" id="nt-hora">
+        </div>
+        <div class="field">
+          <label>Estado</label>
+          <div class="select-wrap">
+            <select id="nt-estado">
+              <option value="Pendiente">Pendiente</option>
+              <option value="Confirmado">Confirmado</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label>Nota</label>
+        <textarea id="nt-nota" rows="2" placeholder="Algo a tener en cuenta..."></textarea>
+      </div>
+      <button class="save-btn" onclick="guardarNuevoTurno()">Guardar turno</button>
+    </div>
+  </div>
+
+  <!-- TAB: CONFIG -->
+  <div class="tab-content" id="tab-config">
+    <div class="card">
+      <div class="slabel lilac">Duración por servicio (en minutos)</div>
+      <div class="tiempos-grid" id="tiempos-grid"></div>
+      <button class="save-btn" onclick="guardarTiempos()" style="margin-top:20px">Guardar tiempos</button>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="slabel amber">Horarios de trabajo</div>
+      <div style="font-size:13px;color:var(--muted);line-height:2">
+        <div>🟣 <strong>Lun / Mié / Vie:</strong> 13:30 — 16:30 hs</div>
+        <div>🟣 <strong>Mar / Jue:</strong> 14:00 — 20:00 hs</div>
+        <div>🟡 <strong>Sábado:</strong> 9:30 — 14:30 hs (opcional)</div>
+        <div>⚪ <strong>Dom:</strong> Cerrado</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── KOOL WA ────────────────────────────────────────────────────
+const KOOL_WA = '5492284384335';
+
+// ── TIEMPOS POR SERVICIO (minutos) ─────────────────────────────
+let tiempos = JSON.parse(localStorage.getItem('kool_tiempos') || 'null') || {
+  'Corte': 30,
+  'Corte y tratamiento': 60,
+  'Color': 120,
+  'Color en raíces': 90,
+  'Color en cabello completo': 120,
+  'Corte y color': 150,
+  'Mechas': 150,
+  'Tratamiento': 60
+};
+
+// ── TURNOS GUARDADOS LOCALMENTE ────────────────────────────────
+let turnos = JSON.parse(localStorage.getItem('kool_turnos') || '[]');
+
+// ── HORARIOS POR DÍA ───────────────────────────────────────────
+const horariosDia = {
+  1: { inicio: '13:30', fin: '16:30' }, // Lunes
+  3: { inicio: '13:30', fin: '16:30' }, // Miércoles
+  5: { inicio: '13:30', fin: '16:30' }, // Viernes
+  2: { inicio: '14:00', fin: '20:00' }, // Martes
+  4: { inicio: '14:00', fin: '20:00' }, // Jueves
+  6: { inicio: '09:30', fin: '14:30' }, // Sábado (opcional)
+};
+
+// ── TABS ───────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const names = ['pendientes','agenda','nuevo','config'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('show'));
+  document.getElementById('tab-'+name).classList.add('show');
+  if (name === 'agenda') renderAgenda();
+  if (name === 'pendientes') renderPendientes();
+  if (name === 'config') renderTiempos();
+}
+
+// ── DATOS DE EJEMPLO (se reemplazan con los del Sheet) ─────────
+const consultasEjemplo = [
+  { nombre:'Laura Martínez', whatsapp:'2284401234', servicio:'Mechas', largo:'Largo', rulo:'Ondas suaves', primera:'Sí, primera vez', dias:'Martes, Jueves', nota:'Quiere aclarar un poco', fecha:'2026-05-10', estado:'Pendiente' },
+  { nombre:'Sofía Ramos', whatsapp:'2284567890', servicio:'Corte y tratamiento', largo:'Medio', rulo:'Rulos definidos', primera:'No, ya vine antes', dias:'Miércoles, Viernes', nota:'', fecha:'2026-05-10', estado:'Pendiente' },
+  { nombre:'Valentina Cruz', whatsapp:'2284991122', servicio:'Corte', largo:'Corto', rulo:'Rulos apretados', primera:'No, ya vine antes', dias:'Lunes', nota:'Le gustan los rizos bien definidos', fecha:'2026-05-09', estado:'Pendiente' },
+];
+
+// ── SUGERENCIA IA ──────────────────────────────────────────────
+function sugerirSlots(consulta) {
+  const minutos = tiempos[consulta.servicio] || 60;
+  const diasPref = consulta.dias ? consulta.dias.split(',').map(d => d.trim()) : [];
+  const diasMap = { 'Lunes':1,'Martes':2,'Miércoles':3,'Jueves':4,'Viernes':5,'Sábado':6 };
+
+  const slots = [];
+  const hoy = new Date();
+
+  for (let offset = 0; offset < 14; offset++) {
+    const d = new Date(hoy);
+    d.setDate(hoy.getDate() + offset);
+    const dow = d.getDay(); // 0=dom
+    if (!horariosDia[dow]) continue;
+
+    const nombreDia = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][dow];
+    const esPref = diasPref.includes(nombreDia);
+    if (!esPref && diasPref.length > 0) continue;
+
+    const h = horariosDia[dow];
+    const [hIni, mIni] = h.inicio.split(':').map(Number);
+    const [hFin, mFin] = h.fin.split(':').map(Number);
+    const inicioMin = hIni * 60 + mIni;
+    const finMin    = hFin * 60 + mFin;
+
+    // Buscar slots libres
+    const turnosDia = turnos.filter(t => {
+      const td = new Date(t.fecha);
+      return td.toDateString() === d.toDateString();
+    });
+
+    let cursor = inicioMin;
+    while (cursor + minutos <= finMin && slots.length < 4) {
+      const ocupado = turnosDia.some(t => {
+        const [th, tm] = t.hora.split(':').map(Number);
+        const tIni = th*60+tm;
+        const tFin = tIni + (tiempos[t.servicio]||60);
+        return cursor < tFin && cursor + minutos > tIni;
+      });
+      if (!ocupado) {
+        const hh = String(Math.floor(cursor/60)).padStart(2,'0');
+        const mm = String(cursor%60).padStart(2,'0');
+        const fechaStr = d.toLocaleDateString('es-AR',{weekday:'short',day:'numeric',month:'short'});
+        slots.push({ label: `${fechaStr} ${hh}:${mm}`, fecha: d.toISOString().split('T')[0], hora: `${hh}:${mm}` });
+      }
+      cursor += 30;
+    }
+    if (slots.length >= 3) break;
+  }
+  return { minutos, slots };
+}
+
+// ── RENDER PENDIENTES ──────────────────────────────────────────
+function renderPendientes() {
+  const container = document.getElementById('lista-pendientes');
+  const todas = consultasEjemplo; // En producción: cargar desde Sheets
+
+  const pendientes = todas.filter(c => c.estado === 'Pendiente');
+
+  if (!pendientes.length) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">✦</div><div class="empty-text">No hay consultas pendientes</div></div>`;
+    return;
+  }
+
+  container.innerHTML = pendientes.map((c, i) => {
+    const { minutos, slots } = sugerirSlots(c);
+    const slotsHtml = slots.map(s =>
+      `<button class="slot-btn" onclick="seleccionarSlot(${i}, '${s.label}', '${s.fecha}', '${s.hora}')">${s.label}</button>`
+    ).join('') || '<span style="font-size:12px;color:var(--muted)">No hay slots disponibles en sus días preferidos</span>';
+
+    return `
+    <div class="consulta" id="consulta-${i}">
+      <div class="consulta-top">
+        <div>
+          <div class="consulta-nombre">${c.nombre}</div>
+          <div class="consulta-fecha">Consultó el ${new Date(c.fecha).toLocaleDateString('es-AR',{day:'numeric',month:'long'})}</div>
+        </div>
+        <span class="badge pendiente">Pendiente</span>
+      </div>
+
+      <div class="consulta-info">
+        <div class="info-item">✂️ <strong>${c.servicio}</strong></div>
+        <div class="info-item">📱 <strong>${c.whatsapp}</strong></div>
+        <div class="info-item">💇 Pelo ${c.largo.toLowerCase()} · ${c.rulo}</div>
+        <div class="info-item">📅 Prefiere: ${c.dias}</div>
+        ${c.nota ? `<div class="info-item" style="grid-column:1/-1">📝 ${c.nota}</div>` : ''}
+        ${c.primera === 'Sí, primera vez' ? `<div class="info-item" style="grid-column:1/-1">⭐ <strong>Primera vez en Kool</strong></div>` : ''}
+      </div>
+
+      <div class="ia-box">
+        <div class="ia-header">
+          <div class="ia-dot"></div>
+          <div class="ia-title">Sugerencia IA · ${minutos} min estimados</div>
+        </div>
+        <div class="ia-text">Slots disponibles en los días que prefiere:</div>
+        <div class="ia-slots" id="slots-${i}">${slotsHtml}</div>
+      </div>
+
+      <div class="consulta-actions">
+        <button class="btn btn-wa" onclick="abrirWA('${c.whatsapp}', '${c.nombre}', '${c.servicio}', ${i})">
+          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Escribir a ${c.nombre.split(' ')[0]}
+        </button>
+        <button class="btn btn-confirmar" onclick="cambiarEstado(${i},'Confirmado')">✓ Confirmar</button>
+        <button class="btn btn-atendido" onclick="cambiarEstado(${i},'Atendido')">Atendida</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── SELECCIONAR SLOT ───────────────────────────────────────────
+const slotsSeleccionados = {};
+function seleccionarSlot(i, label, fecha, hora) {
+  slotsSeleccionados[i] = { label, fecha, hora };
+  document.querySelectorAll(`#slots-${i} .slot-btn`).forEach(b => b.classList.remove('selected'));
+  event.target.classList.add('selected');
+}
+
+// ── ABRIR WHATSAPP ─────────────────────────────────────────────
+function abrirWA(wa, nombre, servicio, idx) {
+  const slot = slotsSeleccionados[idx];
+  let msg;
+  if (slot) {
+    msg = `¡Hola ${nombre}! 💜 Te escribimos desde Kool Beauty Bar.\n\nTenemos disponibilidad para tu ${servicio} el *${slot.label} hs*.\n\n¿Te queda bien ese horario? ✨`;
+  } else {
+    msg = `¡Hola ${nombre}! 💜 Te escribimos desde Kool Beauty Bar.\n\nRecibimos tu consulta para ${servicio}. ¿Cuándo te quedaría mejor? Podemos coordinar un horario para vos 🌸`;
+  }
+  const num = wa.replace(/\D/g,'');
+  const full = num.startsWith('54') ? num : '549' + num;
+  window.open(`https://wa.me/${full}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// ── CAMBIAR ESTADO ─────────────────────────────────────────────
+function cambiarEstado(i, estado) {
+  consultasEjemplo[i].estado = estado;
+  showToast(`✦ Marcado como ${estado}`);
+  renderPendientes();
+}
+
+// ── AGENDA SEMANAL ─────────────────────────────────────────────
+let semanaOffset = 0;
+function cambiarSemana(delta) { semanaOffset += delta; renderAgenda(); }
+
+function renderAgenda() {
+  const hoy = new Date();
+  const lunes = new Date(hoy);
+  lunes.setDate(hoy.getDate() - hoy.getDay() + 1 + semanaOffset * 7);
+
+  const dias = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(lunes);
+    d.setDate(lunes.getDate() + i);
+    dias.push(d);
+  }
+
+  const primerDia = dias[0].toLocaleDateString('es-AR',{day:'numeric',month:'long'});
+  const ultimoDia = dias[6].toLocaleDateString('es-AR',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('week-title').textContent = `${primerDia} — ${ultimoDia}`;
+
+  const nombres = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const grid = document.getElementById('agenda-grid');
+
+  grid.innerHTML = dias.map(d => {
+    const dow = d.getDay();
+    const horario = horariosDia[dow];
+    const esHoy = d.toDateString() === hoy.toDateString();
+    const fechaStr = d.toISOString().split('T')[0];
+
+    const turnosDia = turnos.filter(t => t.fecha === fechaStr);
+
+    const turnosHtml = turnosDia.length
+      ? turnosDia.sort((a,b) => a.hora.localeCompare(b.hora)).map(t => `
+          <div class="turno-bloque" title="${t.nombre} · ${t.servicio}">
+            <div class="turno-hora">${t.hora} hs</div>
+            <div class="turno-nombre">${t.nombre}</div>
+            <div class="turno-serv">${t.servicio}</div>
+          </div>`).join('')
+      : `<div class="dia-vacio">${horario ? 'Libre' : 'Cerrado'}</div>`;
+
+    return `
+    <div class="dia-col ${esHoy ? 'hoy' : ''} ${!horario ? 'cerrado' : ''}">
+      <div class="dia-header">
+        <div class="dia-nombre">${nombres[dow]}</div>
+        <div class="dia-fecha-num">${d.getDate()}</div>
+        <div class="dia-horario">${horario ? horario.inicio + ' — ' + horario.fin : 'Cerrado'}</div>
+      </div>
+      <div class="dia-turnos">${turnosHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── NUEVO TURNO MANUAL ─────────────────────────────────────────
+function guardarNuevoTurno() {
+  const nombre  = document.getElementById('nt-nombre').value.trim();
+  const wa      = document.getElementById('nt-wa').value.trim();
+  const serv    = document.getElementById('nt-servicio').value;
+  const fecha   = document.getElementById('nt-fecha').value;
+  const hora    = document.getElementById('nt-hora').value;
+  const estado  = document.getElementById('nt-estado').value;
+  const nota    = document.getElementById('nt-nota').value.trim();
+
+  if (!nombre || !serv || !fecha || !hora) { showToast('⚠ Completá todos los campos'); return; }
+
+  turnos.push({ nombre, whatsapp:wa, servicio:serv, fecha, hora, estado, nota });
+  localStorage.setItem('kool_turnos', JSON.stringify(turnos));
+
+  // Reset
+  ['nt-nombre','nt-wa','nt-fecha','nt-hora','nt-nota'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('nt-servicio').value = '';
+
+  showToast('✦ Turno guardado');
+  switchTab('agenda');
+}
+
+// ── CONFIG TIEMPOS ─────────────────────────────────────────────
+function renderTiempos() {
+  const grid = document.getElementById('tiempos-grid');
+  grid.innerHTML = Object.entries(tiempos).map(([serv, min]) => `
+    <div class="tiempo-item">
+      <label>${serv}</label>
+      <div class="tiempo-input-wrap">
+        <input type="number" id="t-${serv.replace(/ /g,'_')}" value="${min}" min="15" step="15">
+        <span>min</span>
+      </div>
+    </div>`).join('');
+}
+
+function guardarTiempos() {
+  Object.keys(tiempos).forEach(serv => {
+    const el = document.getElementById('t-'+serv.replace(/ /g,'_'));
+    if (el) tiempos[serv] = parseInt(el.value) || tiempos[serv];
+  });
+  localStorage.setItem('kool_tiempos', JSON.stringify(tiempos));
+  showToast('✦ Tiempos guardados');
+}
+
+// ── TOAST ──────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+document.getElementById('nt-fecha').value = new Date().toISOString().split('T')[0];
+renderPendientes();
+</script>
+</body>
+</html>
