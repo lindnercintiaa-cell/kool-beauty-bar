@@ -349,6 +349,10 @@ function renderConsultas() {
 
 // ── SUGERIR SLOTS ──────────────────────────────────────────────
 let turnosGuardados = [];
+function fechaLocal(d) {
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
 function sugerirSlots(c) {
   const min = tiempos[c.servicio] || 60;
   const diasPref = (c.dias||'').split(',').map(d=>d.trim()).filter(Boolean);
@@ -374,7 +378,7 @@ function sugerirSlots(c) {
       if (!ocup) {
         const hh=String(Math.floor(cur/60)).padStart(2,'0'),mm=String(cur%60).padStart(2,'0');
         const fl=d.toLocaleDateString('es-AR',{weekday:'short',day:'numeric',month:'short'});
-        slots.push({label:`${fl} ${hh}:${mm}`,fecha:fechaStr,hora:`${hh}:${mm}`});
+        slots.push({label:`${fl} ${hh}:${mm}`,fecha:fechaLocal(d),hora:`${hh}:${mm}`});
       }
       cur+=30;
     }
@@ -473,15 +477,23 @@ async function renderAgenda() {
   const lun = new Date(hoy);
   lun.setDate(hoy.getDate() - (hoy.getDay()||7) + 1 + semOff*7);
 
+  // Helper: fecha local sin conversión UTC (evita el bug de zona horaria Argentina)
+  function fechaLocal(d) {
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+
   const dias = Array.from({length:7},(_,i)=>{ const d=new Date(lun); d.setDate(lun.getDate()+i); return d; });
   const p = dias[0].toLocaleDateString('es-AR',{day:'numeric',month:'long'});
   const u = dias[6].toLocaleDateString('es-AR',{day:'numeric',month:'long',year:'numeric'});
   document.getElementById('week-title').textContent = `${p} — ${u}`;
 
+  console.log('Turnos cargados:', JSON.stringify(turnosGuardados));
+
   const ns=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
   document.getElementById('agenda-grid').innerHTML = dias.map(d=>{
     const dow=d.getDay(), esHoy=d.toDateString()===hoy.toDateString();
-    const fStr=d.toISOString().split('T')[0];
+    const fStr=fechaLocal(d);
+    console.log('Buscando turnos para', fStr, '— encontrados:', turnosGuardados.filter(t=>t.fecha===fStr).length);
     const tdDia=turnosGuardados.filter(t=>t.fecha===fStr);
     // Armar bloques de turnos + slots libres intercalados
     const sorted = tdDia.sort((a,b)=>a.hora.localeCompare(b.hora));
