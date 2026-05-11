@@ -449,29 +449,51 @@ function marcarAtendida(i) {
 let semOff = 0;
 function semana(d) { semOff+=d; renderAgenda(); }
 
-async function renderAgenda() {
-  // Cargar turnos del Sheet + los locales
-  try {
-    const r = await fetch(`${SHEETS_URL}?action=getTurnos&key=${KEY}`);
-    const data = await r.json();
-    turnosGuardados = data.map(row=>{
-      // Normalizar fecha — puede venir como "2026-05-10T03:00:00.000Z" o "10/5/2026" o "2026-05-10"
-      let fecha = String(row['Fecha']||'').trim();
-      if (fecha.includes('T')) fecha = fecha.split('T')[0]; // ISO → solo fecha
-      else if (fecha.includes('/')) {
-        const [d,m,y] = fecha.split('/');
-        fecha = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
-      }
-      return {
-        nombre: row['Nombre']||'', wa: row['WhatsApp']||'',
-        servicio: row['Servicio']||'', fecha,
-        hora: row['Hora']||'', estado: row['Estado']||'Confirmado'
-      };
-    }).filter(t=>t.nombre);
-    localStorage.setItem('kool_turnos', JSON.stringify(turnosGuardados));
-  } catch(e) {
-    turnosGuardados = JSON.parse(localStorage.getItem('kool_turnos')||'[]');
+function normalizarFecha(fecha) {
+  fecha = String(fecha||'').trim();
+  if (fecha.includes('T')) return fecha.split('T')[0];
+  if (fecha.includes('/')) {
+    const [d,m,y] = fecha.split('/');
+    return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
   }
+  return fecha;
+}
+
+function parsearTurnos(data) {
+  return data.map(row=>({
+    nombre:   row['Nombre']||'',
+    wa:       row['WhatsApp']||'',
+    servicio: row['Servicio']||'',
+    fecha:    normalizarFecha(row['Fecha']),
+    hora:     String(row['Hora']||'').trim(),
+    estado:   row['Estado']||'Confirmado'
+  })).filter(t=>t.nombre);
+}
+
+async function renderAgenda() {
+  // Cargar turnos via script tag para evitar CORS
+  await new Promise((resolve) => {
+    const callbackName = 'koolTurnosCallback_' + Date.now();
+    const url = `${SHEETS_URL}?action=getTurnos&key=${KEY}&callback=${callbackName}`;
+    window[callbackName] = function(data) {
+      try {
+        turnosGuardados = parsearTurnos(Array.isArray(data) ? data : []);
+        localStorage.setItem('kool_turnos', JSON.stringify(turnosGuardados));
+      } catch(e) {}
+      delete window[callbackName];
+      document.getElementById('jsonp-script')&&document.getElementById('jsonp-script').remove();
+      resolve();
+    };
+    const script = document.createElement('script');
+    script.id  = 'jsonp-script';
+    script.src = url;
+    script.onerror = () => {
+      turnosGuardados = JSON.parse(localStorage.getItem('kool_turnos')||'[]');
+      resolve();
+    };
+    setTimeout(() => { turnosGuardados = JSON.parse(localStorage.getItem('kool_turnos')||'[]'); resolve(); }, 5000);
+    document.head.appendChild(script);
+  });
 
   const hoy = new Date();
   const lun = new Date(hoy);
