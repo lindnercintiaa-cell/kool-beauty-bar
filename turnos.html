@@ -103,6 +103,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .t-quien{color:var(--text);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .t-serv{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dia-vacio{padding:10px 7px;text-align:center;font-size:10px;color:var(--muted);font-style:italic}
+.t-libre{background:rgba(168,196,162,.15);border:1.5px dashed var(--sage);border-radius:7px;padding:5px 8px;margin-bottom:5px;cursor:pointer;transition:all .2s;text-align:center}
+.t-libre:hover{background:var(--sage-lt);border-color:var(--sage-dk)}
+.t-hora-libre{font-size:10px;font-weight:500;color:var(--sage-dk)}
+.t-libre-txt{font-size:9px;color:var(--sage-dk)}
 
 /* Form fields */
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -438,11 +442,20 @@ async function renderAgenda() {
   try {
     const r = await fetch(`${SHEETS_URL}?action=getTurnos&key=${KEY}`);
     const data = await r.json();
-    turnosGuardados = data.map(row=>({
-      nombre: row['Nombre']||'', wa: row['WhatsApp']||'',
-      servicio: row['Servicio']||'', fecha: row['Fecha']||'',
-      hora: row['Hora']||'', estado: row['Estado']||'Confirmado'
-    })).filter(t=>t.nombre);
+    turnosGuardados = data.map(row=>{
+      // Normalizar fecha — puede venir como "2026-05-10T03:00:00.000Z" o "10/5/2026" o "2026-05-10"
+      let fecha = String(row['Fecha']||'').trim();
+      if (fecha.includes('T')) fecha = fecha.split('T')[0]; // ISO → solo fecha
+      else if (fecha.includes('/')) {
+        const [d,m,y] = fecha.split('/');
+        fecha = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+      }
+      return {
+        nombre: row['Nombre']||'', wa: row['WhatsApp']||'',
+        servicio: row['Servicio']||'', fecha,
+        hora: row['Hora']||'', estado: row['Estado']||'Confirmado'
+      };
+    }).filter(t=>t.nombre);
     localStorage.setItem('kool_turnos', JSON.stringify(turnosGuardados));
   } catch(e) {
     turnosGuardados = JSON.parse(localStorage.getItem('kool_turnos')||'[]');
@@ -462,14 +475,46 @@ async function renderAgenda() {
     const dow=d.getDay(), esHoy=d.toDateString()===hoy.toDateString();
     const fStr=d.toISOString().split('T')[0];
     const tdDia=turnosGuardados.filter(t=>t.fecha===fStr);
-    const tHtml=tdDia.length
-      ? tdDia.sort((a,b)=>a.hora.localeCompare(b.hora)).map(t=>`
-          <div class="t-bloque">
-            <div class="t-hora">${t.hora} hs</div>
-            <div class="t-quien">${t.nombre}</div>
-            <div class="t-serv">${t.servicio}</div>
-          </div>`).join('')
-      : `<div class="dia-vacio">${hs[dow]?'Libre':'Cerrado'}</div>`;
+    // Armar bloques de turnos + slots libres intercalados
+    const sorted = tdDia.sort((a,b)=>a.hora.localeCompare(b.hora));
+    let tHtml = '';
+    if (!hs[dow]) {
+      tHtml = `<div class="dia-vacio">Cerrado</div>`;
+    } else {
+      const [hI,mI]=hs[dow].i.split(':').map(Number);
+      const [hF,mF]=hs[dow].f.split(':').map(Number);
+      let cur=hI*60+mI;
+      const fin=hF*60+mF;
+      // Marcar minutos ocupados
+      const ocup=[];
+      sorted.forEach(t=>{
+        const [th,tm]=t.hora.split(':').map(Number);
+        const d=tiempos[t.servicio]||60;
+        for(let x=th*60+tm;x<th*60+tm+d;x++) ocup.push(x);
+      });
+      // Primero mostrar turnos confirmados
+      sorted.forEach(t=>{
+        tHtml+=`<div class="t-bloque" title="${t.nombre} · ${t.servicio}">
+          <div class="t-hora">${t.hora} hs</div>
+          <div class="t-quien">${t.nombre}</div>
+          <div class="t-serv">${t.servicio}</div>
+        </div>`;
+      });
+      // Luego slots libres de 30 min
+      let libreCount=0;
+      while(cur<fin && libreCount<4){
+        if(!ocup.includes(cur)){
+          const hh=String(Math.floor(cur/60)).padStart(2,'0'),mm=String(cur%60).padStart(2,'0');
+          tHtml+=`<div class="t-libre" onclick="irANuevoTurno('${fStr}','${hh}:${mm}')">
+            <div class="t-hora-libre">${hh}:${mm}</div>
+            <div class="t-libre-txt">+ Disponible</div>
+          </div>`;
+          libreCount++;
+        }
+        cur+=30;
+      }
+      if(!tHtml) tHtml=`<div class="dia-vacio">Sin turnos</div>`;
+    }
     return `
     <div class="dia-col ${esHoy?'hoy':''} ${!hs[dow]?'cerrado':''}">
       <div class="dia-head">
@@ -541,6 +586,14 @@ function toast(msg) {
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ── IR A NUEVO TURNO CON FECHA/HORA PRECOMPLETADA ─────────────
+function irANuevoTurno(fecha, hora) {
+  document.getElementById('nt-fecha').value = fecha;
+  document.getElementById('nt-hora').value  = hora;
+  goTab('nuevo');
+  toast('✦ Completá el nombre y servicio para confirmar');
 }
 
 // ── INIT ───────────────────────────────────────────────────────
